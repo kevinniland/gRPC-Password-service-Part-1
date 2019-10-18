@@ -16,7 +16,6 @@ ie\gmit\ds\HashRequestOrBuilder.class
 ie\gmit\ds\PasswordServiceGrpc$PasswordServiceBaseDescriptorSupplier.class
 ie\gmit\ds\PasswordServiceGrpc$PasswordServiceImplBase.class
 ie\gmit\ds\ValidateRequest$Builder.class
-ie\gmit\ds\PasswordServiceImpl.class
 ie\gmit\ds\HashRequest$Builder.class
 ie\gmit\ds\PasswordServiceGrpc$PasswordServiceStub.class
 ie\gmit\ds\HashResponse.class
