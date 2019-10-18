@@ -23,9 +23,7 @@ public class Passwords {
 	private static final int ITERATIONS = 10000;
 	private static final int KEY_LENGTH = 256;
 
-	/*
-	 * static utility class
-	 */
+	// static utility class
 	private Passwords() {
 
 	}
@@ -38,6 +36,7 @@ public class Passwords {
 	public static byte[] getNextSalt() {
 		byte[] salt = new byte[32];
 		RANDOM.nextBytes(salt);
+		
 		return salt;
 	}
 
@@ -50,6 +49,7 @@ public class Passwords {
 	 */
 	public static byte[] hash(char[] password, byte[] salt) {
 		PBEKeySpec pbeKeySpec = new PBEKeySpec(password, salt, ITERATIONS, KEY_LENGTH);
+		
 		try {
 			SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
 			return secretKeyFactory.generateSecret(pbeKeySpec).getEncoded();
@@ -72,6 +72,7 @@ public class Passwords {
 	 */
 	public static boolean isExpectedPassword(char[] password, byte[] salt, byte[] expectedHash) {
 		byte[] pwdHash = hash(password, salt);
+		
 		return Arrays.equals(pwdHash, expectedHash);
 	}
 
@@ -83,6 +84,7 @@ public class Passwords {
 	 */
 	public static String generateRandomPassword(int length) {
 		StringBuilder stringBuilder = new StringBuilder(length);
+		
 		for (int i = 0; i < length; i++) {
 			int c = RANDOM.nextInt(62);
 			
@@ -94,6 +96,7 @@ public class Passwords {
 				stringBuilder.append((char) ('A' + c - 36));
 			}
 		}
+		
 		return stringBuilder.toString();
 	}
 }
