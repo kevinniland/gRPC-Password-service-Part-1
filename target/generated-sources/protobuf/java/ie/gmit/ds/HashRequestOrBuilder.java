@@ -4,21 +4,21 @@
 package ie.gmit.ds;
 
 public interface HashRequestOrBuilder extends
-		// @@protoc_insertion_point(interface_extends:ie.gmit.ds.HashRequest)
-		com.google.protobuf.MessageOrBuilder {
+    // @@protoc_insertion_point(interface_extends:ie.gmit.ds.HashRequest)
+    com.google.protobuf.MessageOrBuilder {
 
-	/**
-	 * <code>int32 userID = 1;</code>
-	 */
-	int getUserID();
+  /**
+   * <code>int32 userID = 1;</code>
+   */
+  int getUserID();
 
-	/**
-	 * <code>string password = 2;</code>
-	 */
-	java.lang.String getPassword();
-
-	/**
-	 * <code>string password = 2;</code>
-	 */
-	com.google.protobuf.ByteString getPasswordBytes();
+  /**
+   * <code>string password = 2;</code>
+   */
+  java.lang.String getPassword();
+  /**
+   * <code>string password = 2;</code>
+   */
+  com.google.protobuf.ByteString
+      getPasswordBytes();
 }

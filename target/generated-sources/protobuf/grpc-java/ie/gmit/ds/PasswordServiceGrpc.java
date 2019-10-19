@@ -19,7 +19,6 @@ import static io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall;
  */
 @javax.annotation.Generated(value = "by gRPC proto compiler (version 1.23.0)", comments = "Source: passwordService.proto")
 public final class PasswordServiceGrpc {
-
 	private PasswordServiceGrpc() {
 		
 	}
@@ -313,6 +312,7 @@ public final class PasswordServiceGrpc {
 				}
 			}
 		}
+		
 		return result;
 	}
 }
