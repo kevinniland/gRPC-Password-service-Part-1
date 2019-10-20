@@ -56,7 +56,6 @@ public class ClientGrpc {
 		}
 	}
 
-	// async method to check password here
 	public void asyncPasswordValidation() {
 		StreamObserver<BoolValue> responseObserver = new StreamObserver<BoolValue>() {
 			@Override
@@ -91,8 +90,12 @@ public class ClientGrpc {
 
 	public static void main(String[] args) throws Exception {
 		ClientGrpc clientGrpc = new ClientGrpc("localhost", 50551);
-		
-		clientGrpc.hashRequest();
-		clientGrpc.asyncPasswordValidation();
+
+		try {
+			clientGrpc.hashRequest();
+			clientGrpc.asyncPasswordValidation();
+		} finally {
+			Thread.currentThread().join();
+		}
 	}
 }
