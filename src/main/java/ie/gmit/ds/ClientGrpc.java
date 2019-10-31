@@ -9,6 +9,7 @@ import com.google.protobuf.ByteString;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 
 public class ClientGrpc {
@@ -81,21 +82,47 @@ public class ClientGrpc {
 		try {
 			asyncPasswordService.validate(ValidateRequest.newBuilder().setPassword(password).setSalt(salt)
 					.setHashedPassword(passwordHashed).build(), responseObserver);
-		} catch (RuntimeException runtimeException) {
-			logger.info(runtimeException.getLocalizedMessage());
+
+			TimeUnit.SECONDS.sleep(1);
+		} catch (StatusRuntimeException | InterruptedException exception) {
+			logger.info(exception.getLocalizedMessage());
 
 			return;
 		}
+
+		return;
 	}
 
 	public static void main(String[] args) throws Exception {
 		ClientGrpc clientGrpc = new ClientGrpc("localhost", 50551);
+		Scanner scanner = new Scanner(System.in);
+		int userID;
+		String password;
+		String repeatChoice;
+		boolean keepAlive = true;
 
-		try {
-			clientGrpc.hashRequest();
-			clientGrpc.asyncPasswordValidation();
-		} finally {
-			Thread.currentThread().join();
+		while (keepAlive) {
+			System.out.println("Enter user ID: ");
+			userID = scanner.nextInt();
+
+			System.out.println("Enter password: ");
+			password = scanner.next();
+
+			try {
+				clientGrpc.hashRequest();
+				clientGrpc.asyncPasswordValidation();
+
+				System.out.println("Enter another user ID and password? (Y/N): ");
+				repeatChoice = scanner.next();
+				
+				if (repeatChoice.equalsIgnoreCase("y")) {
+					keepAlive = false;
+				} else {
+					keepAlive = true;
+				}
+			} finally {
+				Thread.currentThread().join();
+			}
 		}
 	}
 }

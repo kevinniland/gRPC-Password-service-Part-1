@@ -1,7 +1,9 @@
 package ie.gmit.ds;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.logging.Logger;
+
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 
@@ -10,7 +12,7 @@ public class ServerGrpc {
 	private static final Logger logger = Logger.getLogger(ServerGrpc.class.getName());
 	private static final int PORT = 50551;
 
-	private void start() throws IOException {
+	private void start() throws IOException, NoSuchAlgorithmException {
 		grpcServer = ServerBuilder.forPort(PORT).addService(new PasswordServiceImpl()).build().start();
 		logger.info("Server started, listening on " + PORT);
 	}
@@ -32,7 +34,10 @@ public class ServerGrpc {
 		}
 	}
 	
-	public static void main(String[] args) throws IOException, InterruptedException {
+	/*
+	 * Main method to run the server
+	 */
+	public static void main(String[] args) throws IOException, InterruptedException, NoSuchAlgorithmException {
 		final ServerGrpc grpcServer = new ServerGrpc();
 		
 		grpcServer.start();

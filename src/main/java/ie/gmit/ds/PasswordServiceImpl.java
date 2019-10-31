@@ -10,7 +10,6 @@ import com.google.protobuf.ByteString;
 import io.grpc.stub.StreamObserver;
 
 public class PasswordServiceImpl extends PasswordServiceGrpc.PasswordServiceImplBase {
-	private ArrayList<Character> passwordsList;
 	private static final Logger logger = Logger.getLogger(PasswordServiceImpl.class.getName());
 
 	public PasswordServiceImpl() {
@@ -48,6 +47,7 @@ public class PasswordServiceImpl extends PasswordServiceGrpc.PasswordServiceImpl
 
 			streamObserver.onNext(HashResponse.newBuilder().setUserID(hashRequest.getUserID())
 					.setHashedPassword(passwordByteString).setSalt(saltByteString).build());
+			streamObserver.onCompleted();
 		} catch (RuntimeException runtimeException) {
 			/**
 			 * From HashResponse.java
@@ -57,16 +57,15 @@ public class PasswordServiceImpl extends PasswordServiceGrpc.PasswordServiceImpl
 			 * fields will appear empty
 			 */
 			streamObserver.onNext(HashResponse.newBuilder().getDefaultInstanceForType());
+			streamObserver.onCompleted();
 		}
-
-		streamObserver.onCompleted();
 	}
 
 	/**
 	 * Override the validate function from PasswordServiceGrpc
 	 * 
 	 * @see ie.gmit.ds.PasswordServiceGrpc.PasswordServiceImplBase#validate(ie.gmit.ds.
-	 *      HashRequest, io.grpc.stub.StreamObserver)
+	 *      ValidateRequest, io.grpc.stub.StreamObserver)
 	 */
 	@Override
 	public void validate(ValidateRequest validateRequest, StreamObserver<BoolValue> streamObserver) {
@@ -78,13 +77,16 @@ public class PasswordServiceImpl extends PasswordServiceGrpc.PasswordServiceImpl
 			byte[] salt = getSaltByteString.toByteArray();
 			byte[] expectedHash = getPasswordByteString.toByteArray();
 
-			if (Passwords.isExpectedPassword(password, salt, expectedHash)) {
+			if (Passwords.isExpectedPassword(password, salt, expectedHash) == true) {
 				streamObserver.onNext(BoolValue.newBuilder().setValue(true).build());
+				streamObserver.onCompleted();
 			} else {
 				streamObserver.onNext(BoolValue.newBuilder().setValue(false).build());
+				streamObserver.onCompleted();
 			}
-		} catch (RuntimeException runtimeException) {
-			streamObserver.onNext(BoolValue.newBuilder().setValue(false).build());
+		} catch (Exception exception) {
+			// streamObserver.onNext(BoolValue.newBuilder().setValue(false).build());
+			logger.info(exception.getLocalizedMessage());
 		}
 	}
 }
