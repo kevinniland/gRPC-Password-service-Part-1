@@ -17,16 +17,19 @@ public class ClientGrpc {
 	private final ManagedChannel channel;
 	private final PasswordServiceGrpc.PasswordServiceStub asyncPasswordService;
 	private final PasswordServiceGrpc.PasswordServiceBlockingStub syncPasswordService;
+
 	private ByteString passwordHashed;
 	private ByteString salt;
 	private String password;
 	private int userID;
+
 	private Scanner scanner = new Scanner(System.in);
 	HashRequest hashRequest;
 	HashResponse hashResponse;
 
 	public ClientGrpc(String host, int port) {
 		channel = ManagedChannelBuilder.forAddress(host, port).usePlaintext().build();
+
 		syncPasswordService = PasswordServiceGrpc.newBlockingStub(channel);
 		asyncPasswordService = PasswordServiceGrpc.newStub(channel);
 	}
@@ -35,7 +38,9 @@ public class ClientGrpc {
 		channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
 	}
 
-	public void hashRequest() {
+	// public void hashRequest(int userID, String password) throws
+	// InterruptedException {
+	public void hashRequest() throws InterruptedException {
 		System.out.println("Enter user ID: ");
 		userID = scanner.nextInt();
 
@@ -53,11 +58,43 @@ public class ClientGrpc {
 			salt = hashResponse.getSalt();
 		} catch (RuntimeException runtimeException) {
 			logger.info(runtimeException.getLocalizedMessage());
+
 			return;
 		}
+
+//		StreamObserver<HashResponse> streamObserver = new StreamObserver<HashResponse>() {
+//			@Override
+//			public void onNext(HashResponse value) {
+//				salt = value.getSalt();
+//				passwordHashed = value.getHashedPassword();
+//			}
+//
+//			@Override
+//			public void onError(Throwable throwable) {
+//				logger.info(throwable.getLocalizedMessage());
+//			}
+//
+//			@Override
+//			public void onCompleted() {
+//				
+//			}
+//		};
+//		
+//		try {
+//			hashRequest = HashRequest.newBuilder().setUserID(userID).setPassword(password).build();
+//			asyncPasswordService.hash(hashRequest, streamObserver);
+//			
+//			TimeUnit.SECONDS.sleep(2);
+//		} catch (RuntimeException exception) {
+//			logger.info(exception.getLocalizedMessage());
+//			
+//			return;
+//		}
+
+		return;
 	}
 
-	public void asyncPasswordValidation() {
+	public void passwordValidation() {
 		StreamObserver<BoolValue> responseObserver = new StreamObserver<BoolValue>() {
 			@Override
 			public void onNext(BoolValue boolValue) {
@@ -83,7 +120,7 @@ public class ClientGrpc {
 			asyncPasswordService.validate(ValidateRequest.newBuilder().setPassword(password).setSalt(salt)
 					.setHashedPassword(passwordHashed).build(), responseObserver);
 
-			TimeUnit.SECONDS.sleep(1);
+			TimeUnit.SECONDS.sleep(2);
 		} catch (StatusRuntimeException | InterruptedException exception) {
 			logger.info(exception.getLocalizedMessage());
 
@@ -109,12 +146,13 @@ public class ClientGrpc {
 			password = scanner.next();
 
 			try {
+				// clientGrpc.hashRequest(userID, password);
 				clientGrpc.hashRequest();
-				clientGrpc.asyncPasswordValidation();
+				clientGrpc.passwordValidation();
 
 				System.out.println("Enter another user ID and password? (Y/N): ");
 				repeatChoice = scanner.next();
-				
+
 				if (repeatChoice.equalsIgnoreCase("y")) {
 					keepAlive = false;
 				} else {
