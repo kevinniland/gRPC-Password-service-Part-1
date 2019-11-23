@@ -1,5 +1,6 @@
 package ie.gmit.ds;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
@@ -40,28 +41,37 @@ public class ClientGrpc {
 
 	// public void hashRequest(int userID, String password) throws
 	// InterruptedException {
-	public void hashRequest() throws InterruptedException {
-		System.out.println("Enter user ID: ");
-		userID = scanner.nextInt();
-
-		System.out.println("Enter password: ");
-		password = scanner.next();
-
+	// public void hashRequest() throws InterruptedException {
+	
+	public ArrayList<String> hashRequest(int userId, String userPassword) { 
+//		System.out.println("Enter user ID: ");
+//		userID = scanner.nextInt();
+//
+//		System.out.println("Enter password: ");
+//		password = scanner.next();
+//
 		hashRequest = HashRequest.newBuilder().setUserID(userID).setPassword(password).build();
 		hashResponse = HashResponse.newBuilder().getDefaultInstanceForType();
-
+//
 		try {
-			// hashResponse = asyncPasswordService.hash(hashRequest, responseObserver);
+//			hashResponse = asyncPasswordService.hash(hashRequest, responseObserver);
 			hashResponse = syncPasswordService.hash(hashRequest);
 
 			passwordHashed = hashResponse.getHashedPassword();
 			salt = hashResponse.getSalt();
+			
+			ArrayList<String> userCredentials = new ArrayList<String>();
+			
+			userCredentials.add(passwordHashed.toString());
+			userCredentials.add(salt.toString());
+			
+			return userCredentials;
 		} catch (RuntimeException runtimeException) {
 			logger.info(runtimeException.getLocalizedMessage());
 
-			return;
+			return null;
 		}
-
+//
 //		StreamObserver<HashResponse> streamObserver = new StreamObserver<HashResponse>() {
 //			@Override
 //			public void onNext(HashResponse value) {
@@ -89,11 +99,12 @@ public class ClientGrpc {
 //			logger.info(exception.getLocalizedMessage());
 //			
 //			return;
+//		} catch (StatusRuntimeException statusRuntimeException) {
+//			logger.info(statusRuntimeException.getLocalizedMessage());
 //		}
-
-		return;
 	}
 
+	// Async
 	public void passwordValidation() {
 		StreamObserver<BoolValue> responseObserver = new StreamObserver<BoolValue>() {
 			@Override
@@ -132,6 +143,7 @@ public class ClientGrpc {
 
 	public static void main(String[] args) throws Exception {
 		ClientGrpc clientGrpc = new ClientGrpc("localhost", 50551);
+		ServerGrpc serverGrpc = new ServerGrpc();
 		Scanner scanner = new Scanner(System.in);
 		int userID;
 		String password;
@@ -147,7 +159,7 @@ public class ClientGrpc {
 
 			try {
 				// clientGrpc.hashRequest(userID, password);
-				clientGrpc.hashRequest();
+				clientGrpc.hashRequest(userID, password);
 				clientGrpc.passwordValidation();
 
 				System.out.println("Enter another user ID and password? (Y/N): ");

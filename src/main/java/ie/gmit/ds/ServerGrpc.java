@@ -10,25 +10,19 @@ import io.grpc.ServerBuilder;
 
 public class ServerGrpc {
 	private Server grpcServer;
-	// private int portNum;
 	private static final Logger logger = Logger.getLogger(ServerGrpc.class.getName());
-	// private static final int PORT = 50551;
+	private static final int PORT = 50550;
+	private int portNum;
 
-	private void start(int portNumber) throws IOException, NoSuchAlgorithmException {
-		grpcServer = ServerBuilder.forPort(portNumber).addService(new PasswordServiceImpl()).build().start();
-		
+	private void start(int portNum) throws IOException, NoSuchAlgorithmException {
+//	private void start() throws IOException, NoSuchAlgorithmException {
+		grpcServer = ServerBuilder.forPort(portNum).addService(new PasswordServiceImpl()).build().start();
+//		grpcServer = ServerBuilder.forPort(PORT).addService(new PasswordServiceImpl()).build().start();
+
 		// System.out.println(portNumber);
 		// setGrpcServer(portNumber);
-		logger.info("Server started, listening on " + portNumber);
+		logger.info("Server started, listening on " + portNum);
 	}
-	
-//	public int getGrpcServer() {
-//		return portNum;
-//	}
-//
-//	public void setGrpcServer(int portNumber) {
-//		this.portNum = portNumber;
-//	}
 
 	@SuppressWarnings("unused")
 	private void stop() {
@@ -48,21 +42,28 @@ public class ServerGrpc {
 	}
 
 	public void notifyServerPort() {
-		System.out.println("Connected on port");
+		System.out.println("User service connected to password service successfully");
+	}
+
+	public String serverMesage(String message) {
+		return message;
 	}
 
 	/*
 	 * Main method to run the server
 	 * 
-	 * For the "additional instructions for running the service (command-line parameters, etc.), I have included the ability to 
-	 * choose what port the server can run on. User will continuously be prompted to enter a port number. Port number must be within
-	 * a specific range (50,000 - 59,999). The start method has been modified to allow for the port number to be passed in and the server
+	 * For the "additional instructions for running the service (command-line
+	 * parameters, etc.), I have included the ability to choose what port the server
+	 * can run on. User will continuously be prompted to enter a port number. Port
+	 * number must be within a specific range (50,000 - 59,999). The start method
+	 * has been modified to allow for the port number to be passed in and the server
 	 * will then be started on this port number
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException, NoSuchAlgorithmException {
 		final ServerGrpc grpcServer = new ServerGrpc();
-		
+
 		int portNum = 0;
+		
 		Scanner scanner = new Scanner(System.in);
 		boolean serverRunning = false;
 
@@ -73,23 +74,28 @@ public class ServerGrpc {
 
 				if (portNum < 50000 || portNum > 59999) {
 					System.out.println("ERROR: Invlaid port number entered. Please try again\n");
+				} else {
+
+					/*
+					 * Try to start the server with the user-specified port number. If port number
+					 * is already in use, notify user and prompt for another port number
+					 */
+					try {
+						// grpcServer.start(portNum);
+						grpcServer.start(portNum);
+
+						grpcServer.serverMesage("Connection successful");
+
+						grpcServer.blockUntilShutdown();
+
+						serverRunning = true;
+					} catch (Exception exception) {
+						System.out.println("ERROR: Port not available. Please try again\n");
+					}
 				}
 			}
-
-			/*
-			 *  Try to start the server with the user-specified port number. If port number is already in use, notify user
-			 *  and prompt for another port number
-			 */
-			try {
-				grpcServer.start(portNum);
-				grpcServer.blockUntilShutdown();
-
-				serverRunning = true;
-			} catch (Exception exception) {
-				System.out.println("ERROR: Port not available. Please try again\n");
-			}
 		} while (serverRunning == false);
-		
+
 		// Close the scanner to prevent resource leak
 		scanner.close();
 	}

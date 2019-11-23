@@ -57,6 +57,8 @@ public class PasswordServiceImpl extends PasswordServiceGrpc.PasswordServiceImpl
 			streamObserver.onNext(HashResponse.newBuilder().getDefaultInstanceForType());
 			streamObserver.onCompleted();
 		}
+		
+		// streamObserver.onCompleted();
 	}
 
 	/**
